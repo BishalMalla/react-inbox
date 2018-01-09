@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Message from './Component/Message'
 import Messages from './Component/Messages'
 import Toolbar from './Component/Toolbar'
 import ComposeMessage from './Component/ComposeMessage'
+let selectAll = true
 const messages =[
   {
     "id": 1,
@@ -80,18 +80,36 @@ class App extends Component {
     })
   }
   checkboxClicked = (message)=> {
-    console.log('clicked')
-    console.log(message.id - 1)
     this.state.messages[message.id - 1].selected = !this.state.messages[message.id - 1].selected
     this.setState({
       messages: this.state.messages
     })
   }
+  isCheckAll = ()=> {
+    if(selectAll === true) {
+      for(let i = 0; i < this.state.messages.length; i++) {
+        this.state.messages[i].selected = true
+        this.setState({
+          messages: this.state.messages
+        })
+      }
+      selectAll = false
+    }
+    else {
+      for(let i = 0; i < this.state.messages.length; i++) {
+        this.state.messages[i].selected = false
+        this.setState({
+          messages: this.state.messages
+        })
+      }
+      selectAll = true
+    }
+  }
   render() {
     return (
       <div className="container">
         <h1>React Inbox </h1>
-        <Toolbar />
+        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll}/>
         <ComposeMessage />
         <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked}/>
       </div>

@@ -26,8 +26,8 @@ class Message extends React.Component {
     if(check === 'checked') {
       message = <strong>{this.props.message.subject}</strong>
     }
-    else{
-      message= this.props.message.subject
+    else {
+      message = this.props.message.subject
     }
     return(
         <div className={`row message ${isRead}` }>

@@ -1,5 +1,20 @@
 import React from 'react'
-const Toolbar = ()=> {
+const Toolbar = (props)=> {
+  let checkAll = "fa-square-o"
+  // if(props.messages.selected === true) {
+  //   console.log('here')
+  //   checkAll = "fa-check-square-o"
+  // }
+  // console.log(Array.isArray(props.messages))
+  // if(props.messages[0].selected === true) {
+  //   checkAll = "fa-check-square-o"
+  // }
+  let array = props.messages.filter(ele=> {
+    return ele.selected
+  })
+  if(array.length === props.messages.length) {
+    checkAll = "fa-check-square-o"
+  }
   return(
     <div className="row toolbar">
       <div className="col-md-12">
@@ -8,8 +23,8 @@ const Toolbar = ()=> {
           unread messages
         </p>
 
-        <button className="btn btn-default">
-          <i className="fa fa-check-square-o"></i>
+        <button className="btn btn-default" onClick={props.isCheckAll}>
+          <i className={`fa ${checkAll}`}></i>
         </button>
 
         <button className="btn btn-default">
