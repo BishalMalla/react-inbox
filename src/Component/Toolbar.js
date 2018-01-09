@@ -30,14 +30,14 @@ const Toolbar = (props)=> {
           Mark As Unread
         </button>
 
-        <select className="form-control label-select" onClick={props.addLabels}>
+        <select className="form-control label-select" onChange={props.addLabels}>
           <option>Apply label</option>
-          <option value="dev" onClick={props.addLabels}>dev</option>
-          <option value="personal" onClick={props.addLabels}>personal</option>
-          <option value="gschool" onClick={props.addLabels}>gschool</option>
+          <option value="dev">dev</option>
+          <option value="personal">personal</option>
+          <option value="gschool">gschool</option>
         </select>
 
-        <select className="form-control label-select">
+        <select className="form-control label-select" onChange={props.removeLabels}>
           <option>Remove label</option>
           <option value="dev">dev</option>
           <option value="personal">personal</option>

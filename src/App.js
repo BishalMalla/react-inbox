@@ -136,7 +136,7 @@ class App extends Component {
       })
     }
   }
-  moveToTrash= (e)=> {
+  moveToTrash= ()=> {
     let arr = []
     for(let i = 0; i < this.state.messages.length; i++) {
       if(!this.state.messages[i].selected) {
@@ -148,14 +148,46 @@ class App extends Component {
     })
   }
   addLabels =(e)=> {
-    console.log('here')
     console.log(e.target.value)
+    for(let i = 0; i < this.state.messages.length; i++) {
+      let present = false
+      if(this.state.messages[i].selected === true) {
+        for(let j = 0; j < this.state.messages[i].labels.length; j++) {
+          if(this.state.messages[i].labels[j] === e.target.value) {
+            present = true
+          }
+        }
+        if(!present) {
+          this.state.messages[i].labels.push(e.target.value)
+        }
+      }
+    }
+    this.setState({
+      messages: this.state.messages
+    })
+    e.target.value = 'Apply label'
+  }
+  removeLabels = (e)=> {
+    let arr = this.state.messages.slice(0)
+    let arr1 = 0
+    for(let i = 0; i < arr.length; i++) {
+      if(arr[i].selected === true) {
+        for(let j = 0; j < arr[i].labels.length; j++)  {
+          if(arr[i].labels[j] === e.target.value) {
+            arr[i].labels.splice(j,1)
+          }
+        }
+      }
+    }
+    this.setState({
+      messages: arr
+    })
   }
   render() {
     return (
       <div className="container">
         <h1>React Inbox </h1>
-        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels}/>
+        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels} removeLabels={this.removeLabels}/>
         <ComposeMessage />
         <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked}/>
       </div>
