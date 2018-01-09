@@ -74,13 +74,21 @@ class App extends Component {
   }
 
   isStarred = (message)=> {
-    this.state.messages[message.id - 1].starred = !this.state.messages[message.id - 1].starred
+    for(let i = 0; i < this.state.messages.length; i++) {
+      if(this.state.messages[i].id === message.id) {
+        this.state.messages[i].starred = !this.state.messages[i].starred
+      }
+    }
     this.setState({
       messages: this.state.messages
     })
   }
   checkboxClicked = (message)=> {
-    this.state.messages[message.id - 1].selected = !this.state.messages[message.id - 1].selected
+    for(let i = 0; i < this.state.messages.length; i++) {
+      if(this.state.messages[i].id === message.id) {
+        this.state.messages[i].selected = !this.state.messages[i].selected
+      }
+    }
     this.setState({
       messages: this.state.messages
     })
@@ -105,11 +113,49 @@ class App extends Component {
       selectAll = true
     }
   }
+  markAsRead= ()=> {
+    for(let i = 0; i < this.state.messages.length; i++) {
+      if(this.state.messages[i].read === false && this.state.messages[i].selected === true) {
+        this.state.messages[i].read = true
+        this.state.messages[i].selected = false
+      }
+      this.setState({
+        messages: this.state.messages
+      })
+    }
+  }
+  marksAsUnread= ()=>{
+    console.log('here')
+    for(let i = 0; i < this.state.messages.length; i++) {
+      if(this.state.messages[i].selected === true) {
+        this.state.messages[i].read = false
+        this.state.messages[i].selected = false
+      }
+      this.setState({
+        messages: this.state.messages
+      })
+    }
+  }
+  moveToTrash= (e)=> {
+    let arr = []
+    for(let i = 0; i < this.state.messages.length; i++) {
+      if(!this.state.messages[i].selected) {
+        arr.push(this.state.messages[i])
+      }
+    }
+    this.setState({
+      messages: arr
+    })
+  }
+  addLabels =(e)=> {
+    console.log('here')
+    console.log(e.target.value)
+  }
   render() {
     return (
       <div className="container">
         <h1>React Inbox </h1>
-        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll}/>
+        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels}/>
         <ComposeMessage />
         <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked}/>
       </div>

@@ -3,7 +3,7 @@ class Message extends React.Component {
   // Editing here
 
   render() {
-    // console.log(this.props)
+    let isSelected = ""
     let isRead
     let message
     let check = ""
@@ -23,14 +23,11 @@ class Message extends React.Component {
     else {
       isStarred = "star fa fa-star-o"
     }
-    if(check === 'checked') {
-      message = <strong>{this.props.message.subject}</strong>
-    }
-    else {
-      message = this.props.message.subject
+    if(this.props.message.selected === true) {
+      isSelected = "selected"
     }
     return(
-        <div className={`row message ${isRead}` }>
+        <div className={`row message ${isRead} ${isSelected}` }>
           <div className="col-xs-1">
             <div className="row">
               <div className="col-xs-2" onClick={()=>this.props.checkboxClicked(this.props.message)}>
@@ -48,7 +45,7 @@ class Message extends React.Component {
               )
             })}
             <a href="#">
-              {message}
+              {this.props.message.subject}
             </a>
           </div>
         </div>
