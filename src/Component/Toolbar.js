@@ -1,6 +1,7 @@
 import React from 'react'
 const Toolbar = (props)=> {
   let checkAll = "fa-square-o"
+  let disabled = ""
   let array = props.messages.filter(ele=> {
     return ele.selected
   })
@@ -15,6 +16,15 @@ const Toolbar = (props)=> {
       return ele
     }
   })
+  let noMessageSelect = props.messages.filter(ele=> {
+    if(ele.selected) {
+      return ele
+    }
+  })
+  console.log(noMessageSelect)
+  if(noMessageSelect.length === 0) {
+    disabled = "disabled"
+  }
   return(
     <div className="row toolbar">
       <div className="col-md-12">
@@ -27,29 +37,29 @@ const Toolbar = (props)=> {
           <i className={`fa ${checkAll}`}></i>
         </button>
 
-        <button className="btn btn-default" onClick={props.markAsRead}>
+        <button className="btn btn-default" onClick={props.markAsRead} disabled={disabled}>
           Mark As Read
         </button>
 
-        <button className="btn btn-default" onClick={props.marksAsUnread}>
+        <button className="btn btn-default" onClick={props.marksAsUnread} disabled={disabled}>
           Mark As Unread
         </button>
 
-        <select className="form-control label-select" onChange={props.addLabels}>
+        <select className="form-control label-select" onChange={props.addLabels} disabled={disabled}>
           <option>Apply label</option>
           <option value="dev">dev</option>
           <option value="personal">personal</option>
           <option value="gschool">gschool</option>
         </select>
 
-        <select className="form-control label-select" onChange={props.removeLabels}>
+        <select className="form-control label-select" onChange={props.removeLabels} disabled={disabled}>
           <option>Remove label</option>
           <option value="dev">dev</option>
           <option value="personal">personal</option>
           <option value="gschool">gschool</option>
         </select>
 
-        <button className="btn btn-default" onClick={props.moveToTrash}>
+        <button className="btn btn-default" onClick={props.moveToTrash} disabled={disabled}>
           <i className="fa fa-trash-o"></i>
         </button>
       </div>
