@@ -174,7 +174,7 @@ class App extends Component {
       if(arr[i].selected === true) {
         for(let j = 0; j < arr[i].labels.length; j++)  {
           if(arr[i].labels[j] === e.target.value) {
-            arr[i].labels.splice(j,1)
+            arr[i].labels.splice(j, 1)
           }
         }
       }
@@ -182,6 +182,7 @@ class App extends Component {
     this.setState({
       messages: arr
     })
+    e.target.value = 'Remove label'
   }
   render() {
     return (

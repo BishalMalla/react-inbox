@@ -10,11 +10,16 @@ const Toolbar = (props)=> {
   if(array.length > 0 && array.length < props.messages.length) {
     checkAll = "fa-minus-square-o"
   }
+  let unreadMessageCount = props.messages.filter(ele=> {
+    if(ele.read === false) {
+      return ele
+    }
+  })
   return(
     <div className="row toolbar">
       <div className="col-md-12">
         <p className="pull-right">
-          <span className="badge badge">2</span>
+          <span className="badge badge">{unreadMessageCount.length}</span>
           unread messages
         </p>
 
