@@ -5,191 +5,287 @@ import Messages from './Component/Messages'
 import Toolbar from './Component/Toolbar'
 import ComposeMessage from './Component/ComposeMessage'
 let selectAll = true
-const messages =[
-  {
-    "id": 1,
-    "subject": "You can't input the protocol without calculating the mobile RSS protocol!",
-    "read": false,
-    "starred": true,
-    "labels": ["dev", "personal"]
-  },
-  {
-    "id": 2,
-    "subject": "connecting the system won't do anything, we need to input the mobile AI panel!",
-    "read": false,
-    "starred": false,
-    "selected": true,
-    "labels": []
-  },
-  {
-    "id": 3,
-    "subject": "Use the 1080p HTTP feed, then you can parse the cross-platform hard drive!",
-    "read": false,
-    "starred": true,
-    "labels": ["dev"]
-  },
-  {
-    "id": 4,
-    "subject": "We need to program the primary TCP hard drive!",
-    "read": true,
-    "starred": false,
-    "selected": true,
-    "labels": []
-  },
-  {
-    "id": 5,
-    "subject": "If we override the interface, we can get to the HTTP feed through the virtual EXE interface!",
-    "read": false,
-    "starred": false,
-    "labels": ["personal"]
-  },
-  {
-    "id": 6,
-    "subject": "We need to back up the wireless GB driver!",
-    "read": true,
-    "starred": true,
-    "labels": []
-  },
-  {
-    "id": 7,
-    "subject": "We need to index the mobile PCI bus!",
-    "read": true,
-    "starred": false,
-    "labels": ["dev", "personal"]
-  },
-  {
-    "id": 8,
-    "subject": "If we connect the sensor, we can get to the HDD port through the redundant IB firewall!",
-    "read": true,
-    "starred": true,
-    "labels": []
-  }
-]
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      messages: messages,
+      messages: [],
+      display: false
     }
+  }
+  //getting the data messages
+  async componentDidMount() {
+    let data = await fetch('http://localhost:8082/api/messages')
+    let json = await data.json()
+    this.setState({
+      messages: json._embedded.messages
+    })
+  }
+  //posting the new messages
+  addMessage = async(message)=> {
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'POST',
+        body: JSON.stringify({subject: message.subject,
+      body: message.body,}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      })
+      const newMessage = await response.json()
+      const messages = [newMessage,...this.state.messages]
+      this.setState({
+        messages: messages,
+        display: false
+      })
+      document.getElementById('subject').value = ""
+      document.getElementById('body').value = ""
+
   }
 
-  isStarred = (message)=> {
-    for(let i = 0; i < this.state.messages.length; i++) {
-      if(this.state.messages[i].id === message.id) {
-        this.state.messages[i].starred = !this.state.messages[i].starred
+  isStarred = async (message)=> {
+    const obj = {
+      'messageIds':[ message.id],
+      "command": "star",
+      "star": !message.starred
+    }
+    let arr = this.state.messages.slice(0)
+    for(let i = 0; i < arr.length; i++) {
+      if(arr[i].id === message.id) {
+        arr[i].starred = !arr[i].starred
       }
     }
     this.setState({
-      messages: this.state.messages
+      messages: arr
     })
+    console.log(obj)
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
   }
   checkboxClicked = (message)=> {
-    for(let i = 0; i < this.state.messages.length; i++) {
-      if(this.state.messages[i].id === message.id) {
-        this.state.messages[i].selected = !this.state.messages[i].selected
+    let arr = this.state.messages.slice(0)
+    for(let i = 0; i < arr.length; i++) {
+      if(arr[i].id === message.id) {
+        arr[i].selected = !arr[i].selected
       }
     }
     this.setState({
-      messages: this.state.messages
+      messages: arr
     })
   }
+  async toggleSelect(message) {
+    this.checkboxClicked(message)
+  }
   isCheckAll = ()=> {
+    let message = this.state.messages.slice(0)
     if(selectAll === true) {
-      for(let i = 0; i < this.state.messages.length; i++) {
-        this.state.messages[i].selected = true
+      for(let i = 0; i < message.length; i++) {
+        message[i].selected = true
         this.setState({
-          messages: this.state.messages
+          messages: message
         })
       }
       selectAll = false
     }
     else {
-      for(let i = 0; i < this.state.messages.length; i++) {
-        this.state.messages[i].selected = false
+      for(let i = 0; i < message.length; i++) {
+        message[i].selected = false
         this.setState({
-          messages: this.state.messages
+          messages: message
         })
       }
       selectAll = true
     }
   }
-  markAsRead= ()=> {
-    for(let i = 0; i < this.state.messages.length; i++) {
-      if(this.state.messages[i].read === false && this.state.messages[i].selected === true) {
-        this.state.messages[i].read = true
-        this.state.messages[i].selected = false
+  markAsRead= async()=> {
+    let message = this.state.messages.slice(0)
+    let indexes = message.map(function(obj) {
+      if(obj.selected === true) {
+          return obj.id;
+      }
+    }).filter(isFinite)
+    console.log(typeof(index))
+    const obj = {
+      'messageIds': indexes,
+      "command": "read",
+      "read": true
+    }
+    console.log(obj)
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
+    for(let i = 0 ;i< indexes.length; i++){
+      for(let j = 0 ; j < message.length; j++){
+        if(message[j].id === indexes[i]) {
+          message[j].read = true
+          message[j].selected = false
+        }
+      }
+    }
+    this.setState({
+      messages: message
+    })
+    console.log(this.state.messages)
+  }
+  marksAsUnread= async()=> {
+    let message = this.state.messages.slice(0)
+    let indexes = message.map(function(obj) {
+      if(obj.selected === true) {
+          return obj.id;
+      }
+    }).filter(isFinite)
+    // console.log(indexes)
+    const obj = {
+      'messageIds': indexes,
+      "command": "read",
+      "read": false
+    }
+    console.log(obj)
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
+      console.log(response.json)
+      for(let i = 0 ; i < indexes.length; i++) {
+        for(let j = 0 ; j < message.length; j++) {
+          if(message[j].id === indexes[i]) {
+            // console.log('in here')
+            message[j].read = false
+            message[j].selected = false
+          }
+        }
       }
       this.setState({
-        messages: this.state.messages
+        messages: message
       })
-    }
+      // console.log(this.state.messages)
   }
-  marksAsUnread= ()=>{
-    console.log('here')
-    for(let i = 0; i < this.state.messages.length; i++) {
-      if(this.state.messages[i].selected === true) {
-        this.state.messages[i].read = false
-        this.state.messages[i].selected = false
-      }
-      this.setState({
-        messages: this.state.messages
-      })
-    }
-  }
-  moveToTrash= ()=> {
+  moveToTrash= async()=> {
     let arr = []
-    for(let i = 0; i < this.state.messages.length; i++) {
-      if(!this.state.messages[i].selected) {
-        arr.push(this.state.messages[i])
+    let message = this.state.messages.slice(0)
+    let indexes = message.map(function(obj) {
+      if(obj.selected === true) {
+          return obj.id;
+      }
+    }).filter(isFinite)
+    const obj = {
+      'messageIds': indexes,
+      "command": "delete",
+    }
+    for(let i = 0; i < message.length; i++) {
+      if(!message[i].selected) {
+        arr.push(message[i])
       }
     }
     this.setState({
       messages: arr
     })
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
   }
-  addLabels =(e)=> {
-    console.log(e.target.value)
-    for(let i = 0; i < this.state.messages.length; i++) {
-      let present = false
-      if(this.state.messages[i].selected === true) {
-        for(let j = 0; j < this.state.messages[i].labels.length; j++) {
-          if(this.state.messages[i].labels[j] === e.target.value) {
-            present = true
+  addLabels =async (e)=> {
+    let message = this.state.messages.slice(0)
+    let indexes = message.map(function(obj) {
+      if(obj.selected === true) {
+          return obj.id;
+      }
+    }).filter(isFinite)
+    const obj = {
+      'messageIds': indexes,
+      "command": "addLabel",
+      "label": e.target.value
+    }
+    for(let i = 0; i < message.length; i++) {
+      for(let j = 0; j < indexes.length; j++) {
+        if(message[i].id === indexes[j]) {
+          if(message[i].labels.includes(e.target.value)) {
+            return
           }
-        }
-        if(!present) {
-          this.state.messages[i].labels.push(e.target.value)
+          message[i].labels.push(e.target.value)
+          message[i].selected = false
         }
       }
     }
     this.setState({
-      messages: this.state.messages
+      messages: message
     })
     e.target.value = 'Apply label'
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
   }
-  removeLabels = (e)=> {
-    let arr = this.state.messages.slice(0)
-    let arr1 = 0
-    for(let i = 0; i < arr.length; i++) {
-      if(arr[i].selected === true) {
-        for(let j = 0; j < arr[i].labels.length; j++)  {
-          if(arr[i].labels[j] === e.target.value) {
-            arr[i].labels.splice(j, 1)
+  removeLabels = async(e)=> {
+    let message = this.state.messages.slice(0)
+    let indexes = message.map(function(obj) {
+      if(obj.selected === true) {
+          return obj.id;
+      }
+    }).filter(isFinite)
+    const obj = {
+      'messageIds': indexes,
+      "command": "removeLabel",
+      "label": e.target.value
+    }
+    for(let i = 0; i < message.length; i++) {
+      if(message[i].selected === true) {
+        for(let j = 0; j < message[i].labels.length; j++)  {
+          if(message[i].labels[j] === e.target.value) {
+            message[i].labels.splice(j, 1)
+            message[i].selected = false
           }
         }
       }
     }
     this.setState({
-      messages: arr
+      messages: message
     })
     e.target.value = 'Remove label'
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
+  }
+  showCompose = ()=> {
+    this.setState({
+      display: true
+    })
   }
   render() {
     return (
       <div className="container">
         <h1>React Inbox </h1>
-        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels} removeLabels={this.removeLabels}/>
-        <ComposeMessage />
+        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels} removeLabels={this.removeLabels} showCompose={this.showCompose}/>
+        <ComposeMessage addMessage={this.addMessage} display={this.state.display}/>
         <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked}/>
       </div>
     );

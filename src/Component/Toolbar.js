@@ -21,7 +21,6 @@ const Toolbar = (props)=> {
       return ele
     }
   })
-  console.log(noMessageSelect)
   if(noMessageSelect.length === 0) {
     disabled = "disabled"
   }
@@ -32,6 +31,8 @@ const Toolbar = (props)=> {
           <span className="badge badge">{unreadMessageCount.length}</span>
           unread messages
         </p>
+
+        <button className="btn btn-default" style={{background: 'red'}} onClick={props.showCompose}><i className="fa fa-plus"></i></button>
 
         <button className="btn btn-default" onClick={props.isCheckAll}>
           <i className={`fa ${checkAll}`}></i>

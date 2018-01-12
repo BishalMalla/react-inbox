@@ -1,7 +1,20 @@
 import React from 'react'
-const ComposeMessage = ()=> {
+const ComposeMessage = ({addMessage,display})=> {
+  const messageAdded = (e)=> {
+    e.preventDefault()
+    addMessage({
+      subject: e.target.subject.value,
+      body: e.target.body.value,
+    })
+  }
+  console.log(display)
+  let view = "none"
+  if(display === true) {
+    console.log("in here")
+    view = "block"
+  }
   return(
-    <form className="form-horizontal well">
+    <form className="form-horizontal well" onSubmit={ messageAdded } style={{display: view}}>
       <div className="form-group">
         <div className="col-sm-8 col-sm-offset-2">
           <h4>Compose Message</h4>
