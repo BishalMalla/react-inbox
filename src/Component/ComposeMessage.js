@@ -1,43 +1,41 @@
 import React from 'react'
-const ComposeMessage = ({addMessage,display})=> {
-  const messageAdded = (e)=> {
+import { withRouter } from 'react-router-dom'
+class ComposeMessage extends React.Component {
+  messageAdded = (e)=> {
     e.preventDefault()
-    addMessage({
+    this.props.addMessage({
       subject: e.target.subject.value,
-      body: e.target.body.value,
+      body: e.target.body.value
     })
+    this.props.history.push('/')
   }
-  console.log(display)
-  let view = "none"
-  if(display === true) {
-    console.log("in here")
-    view = "block"
-  }
+  render() {
   return(
-    <form className="form-horizontal well" onSubmit={ messageAdded } style={{display: view}}>
-      <div className="form-group">
-        <div className="col-sm-8 col-sm-offset-2">
-          <h4>Compose Message</h4>
+      <form className="form-horizontal well" onSubmit={ this.messageAdded }>
+        <div className="form-group">
+          <div className="col-sm-8 col-sm-offset-2">
+            <h4>Compose Message</h4>
+          </div>
         </div>
-      </div>
-      <div className="form-group">
-        <label htmlFor="subject" className="col-sm-2 control-label">Subject</label>
-        <div className="col-sm-8">
-          <input type="text" className="form-control" id="subject" placeholder="Enter a subject" name="subject"></input>
+        <div className="form-group">
+          <label htmlFor="subject" className="col-sm-2 control-label">Subject</label>
+          <div className="col-sm-8">
+            <input type="text" className="form-control" id="subject" placeholder="Enter a subject" name="subject"></input>
+          </div>
         </div>
-      </div>
-      <div className="form-group">
-        <label htmlFor="body" className="col-sm-2 control-label">Body</label>
-        <div className="col-sm-8">
-          <textarea name="body" id="body" className="form-control"></textarea>
+        <div className="form-group">
+          <label htmlFor="body" className="col-sm-2 control-label">Body</label>
+          <div className="col-sm-8">
+            <textarea name="body" id="body" className="form-control"></textarea>
+          </div>
         </div>
-      </div>
-      <div className="form-group">
-        <div className="col-sm-8 col-sm-offset-2">
-          <input type="submit" value="Send" className="btn btn-primary"></input>
+        <div className="form-group">
+          <div className="col-sm-8 col-sm-offset-2">
+            <input type="submit" value="Send" className="btn btn-primary"></input>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
   )
 }
-export default ComposeMessage
+}
+export default withRouter(ComposeMessage)

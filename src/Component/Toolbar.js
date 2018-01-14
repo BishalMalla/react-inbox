@@ -1,4 +1,9 @@
 import React from 'react'
+import {
+  Route,
+  Link,
+  Switch
+} from 'react-router-dom'
 const Toolbar = (props)=> {
   let checkAll = "fa-square-o"
   let disabled = ""
@@ -32,7 +37,18 @@ const Toolbar = (props)=> {
           unread messages
         </p>
 
-        <button className="btn btn-default" style={{background: 'red'}} onClick={props.showCompose}><i className="fa fa-plus"></i></button>
+        <Switch>
+         <Route path="/compose" render={ () => (
+           <Link className="btn btn-danger" to="/">
+             <i className={`fa fa-plus`}></i>
+           </Link>
+         )} />
+         <Route render={ () => (
+           <Link className="btn btn-danger" to="/compose">
+             <i className={`fa fa-plus`}></i>
+           </Link>
+         )} />
+       </Switch>
 
         <button className="btn btn-default" onClick={props.isCheckAll}>
           <i className={`fa ${checkAll}`}></i>

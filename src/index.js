@@ -6,6 +6,15 @@ import 'font-awesome/css/font-awesome.css';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-
-ReactDOM.render(<App />, document.getElementById('root'));
+import {
+  BrowserRouter as Router,
+} from 'react-router-dom'
+// ReactDOM.render(<App />, document.getElementById('root'));
+// console.log(ComposeMessage)
+ReactDOM.render(
+  <Router>
+    <App />
+  </Router>,
+  document.getElementById('root')
+)
 registerServiceWorker();

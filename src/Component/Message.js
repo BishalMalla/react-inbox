@@ -1,11 +1,26 @@
 import React from 'react'
+import {
+  Route,
+  Link,
+} from 'react-router-dom'
 class Message extends React.Component {
   // Editing here
-
+  constructor(props) {
+    super(props)
+    this.state = {
+      body: []
+    }
+  }
+  async componentDidMount() {
+    let data = await fetch(`http://localhost:8082/api/messages/${this.props.message.id}`)
+    let json = await data.json()
+    this.setState({
+      body: json.body
+    })
+  }
   render() {
     let isSelected = ""
     let isRead
-    let message
     let check = ""
     let isStarred = ""
     if(this.props.message.read === true) {
@@ -44,10 +59,18 @@ class Message extends React.Component {
                 <span key= {i} className="label label-warning">{ele}</span>
               )
             })}
-            <a href="#">
-              {this.props.message.subject}
-            </a>
+              <Link to= {`/messages/${this.props.message.id}`}>
+                <span onClick={this.props.markRead} id={this.props.message.id}> {this.props.message.subject}</span>
+              </Link>
           </div>
+          <Route path={`/messages/${this.props.message.id}`} render={ () => (
+            <div className="row message-body">
+              <div className="col-xs-11 col-xs-offset-1">
+                <br></br>
+                 {this.state.body}
+              </div>
+            </div>
+          )}/>
         </div>
     )
   }

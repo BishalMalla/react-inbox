@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom'
 import './App.css';
 import Message from './Component/Message'
 import Messages from './Component/Messages'
@@ -18,7 +23,7 @@ class App extends Component {
     let data = await fetch('http://localhost:8082/api/messages')
     let json = await data.json()
     this.setState({
-      messages: json._embedded.messages
+      messages: json._embedded.messages.reverse()
     })
   }
   //posting the new messages
@@ -38,11 +43,10 @@ class App extends Component {
         messages: messages,
         display: false
       })
-      document.getElementById('subject').value = ""
-      document.getElementById('body').value = ""
+      // document.getElementById('subject').value = ""
+      // document.getElementById('body').value = ""
 
   }
-
   isStarred = async (message)=> {
     const obj = {
       'messageIds':[ message.id],
@@ -58,7 +62,6 @@ class App extends Component {
     this.setState({
       messages: arr
     })
-    console.log(obj)
     const response = await fetch('http://localhost:8082/api/messages', {
         method: 'PATCH',
         headers: {
@@ -110,13 +113,11 @@ class App extends Component {
           return obj.id;
       }
     }).filter(isFinite)
-    console.log(typeof(index))
     const obj = {
       'messageIds': indexes,
       "command": "read",
       "read": true
     }
-    console.log(obj)
     const response = await fetch('http://localhost:8082/api/messages', {
         method: 'PATCH',
         headers: {
@@ -136,7 +137,6 @@ class App extends Component {
     this.setState({
       messages: message
     })
-    console.log(this.state.messages)
   }
   marksAsUnread= async()=> {
     let message = this.state.messages.slice(0)
@@ -145,13 +145,11 @@ class App extends Component {
           return obj.id;
       }
     }).filter(isFinite)
-    // console.log(indexes)
     const obj = {
       'messageIds': indexes,
       "command": "read",
       "read": false
     }
-    console.log(obj)
     const response = await fetch('http://localhost:8082/api/messages', {
         method: 'PATCH',
         headers: {
@@ -160,11 +158,9 @@ class App extends Component {
         },
         body: JSON.stringify(obj)
       })
-      console.log(response.json)
       for(let i = 0 ; i < indexes.length; i++) {
         for(let j = 0 ; j < message.length; j++) {
           if(message[j].id === indexes[i]) {
-            // console.log('in here')
             message[j].read = false
             message[j].selected = false
           }
@@ -173,7 +169,6 @@ class App extends Component {
       this.setState({
         messages: message
       })
-      // console.log(this.state.messages)
   }
   moveToTrash= async()=> {
     let arr = []
@@ -280,13 +275,41 @@ class App extends Component {
       display: true
     })
   }
+  markRead = async(e)=> {
+    let arr = this.state.messages.slice(0)
+    arr.map(ele => {
+        if(ele.id === Number(e.target.id)){
+          ele.read = true
+        }
+    })
+    const obj = {
+      'messageIds': [Number(e.target.id)],
+      "command": "read",
+      "read": true
+    }
+    this.setState({
+      messages: arr
+    })
+    const response = await fetch('http://localhost:8082/api/messages', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(obj)
+      })
+  }
   render() {
     return (
       <div className="container">
         <h1>React Inbox </h1>
-        <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels} removeLabels={this.removeLabels} showCompose={this.showCompose}/>
-        <ComposeMessage addMessage={this.addMessage} display={this.state.display}/>
-        <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked}/>
+          <Toolbar messages={this.state.messages} isCheckAll={this.isCheckAll} markAsRead={this.markAsRead} marksAsUnread={this.marksAsUnread} moveToTrash={this.moveToTrash} addLabels={this.addLabels} removeLabels={this.removeLabels} showCompose={this.showCompose}/>
+          <Route path='/compose' render={() => (
+            <ComposeMessage addMessage={ this.addMessage} display={this.state.display}/>
+          )} />
+
+          {/* <ComposeMessage addMessage={this.addMessage} display={this.state.display}/> */}
+          <Messages messages={this.state.messages} starred={this.isStarred} checkboxClicked={this.checkboxClicked} markRead={this.markRead}/ >
       </div>
     );
   }
